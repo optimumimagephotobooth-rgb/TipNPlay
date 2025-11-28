@@ -1,0 +1,62 @@
+language = "nodejs"
+run = "npm run dev"
+
+[deploy]
+run = ["sh", "-c", "npm run build"]
+
+[env]
+VITE_STRIPE_PUBLISHABLE_KEY = "pk_test_YOUR_KEY_HERE"
+
+[packager]
+language = "nodejs"
+ignoredPackages = ["unit_tests"]
+
+[packager.features]
+enabledForHosting = false
+packageSearch = true
+guessImports = true
+
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix", ".config"]
+
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix", ".config"]
+
+[languages]
+
+[languages.javascript]
+pattern = "**/{*.js,*.jsx,*.ts,*.tsx}"
+
+[languages.javascript.languageServer]
+start = "typescript-language-server --stdio"
+
+[interpreter]
+command = [
+  "node",
+  "-r",
+  "./.config/node_modules/ts-node/register/index.js"
+]
+
+[unitTest]
+language = "nodejs"
+
+[debugger]
+support = true
+
+[debugger.interactive]
+transport = "localhost:0"
+startCommand = ["dap-node"]
+initializeMessage = { command = "initialize", arguments = { adapterID = "node" } }
+launchMessage = { command = "launch", arguments = { restart = false, noDebug = false } }
+
+[debugger.interactive.integratedAdapter]
+dapTcpAddress = "localhost:0"
+
+[debugger.interactive.initializeMessage]
+command = "initialize"
+arguments = { adapterID = "node" }
+
+[debugger.interactive.launchMessage]
+command = "launch"
+arguments = { restart = false, noDebug = false }
+
