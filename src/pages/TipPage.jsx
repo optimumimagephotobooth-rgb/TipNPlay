@@ -3,13 +3,17 @@ import { useParams } from 'react-router-dom'
 import confetti from 'canvas-confetti'
 import toast, { Toaster } from 'react-hot-toast'
 import { supabase, eventsTable, tipsTable } from '../lib/supabase'
+import SocialProof from '../components/SocialProof'
+import ViralShare from '../components/ViralShare'
 import './TipPage.css'
 
 // Cache for event data (5 minutes)
 const eventCache = new Map()
 const CACHE_DURATION = 5 * 60 * 1000
 
-function TipPage() {
+function TipPageContent() {
+  const stripe = useStripe()
+  const elements = useElements()
   const { eventId } = useParams()
   const [event, setEvent] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -134,71 +138,13 @@ function TipPage() {
     })
   }, [])
 
-  const handleTip = async (e) => {
+  // Form submission - payment handled by TipPaymentForm
+  const handleTip = (e) => {
     e.preventDefault()
-    
-    const amount = selectedAmount || parseFloat(customAmount)
-    if (!amount || amount <= 0) {
-      toast.error('Please select or enter a tip amount')
-      return
-    }
-
-    if (amount < 0.01) {
-      toast.error('Minimum tip amount is $0.01')
-      return
-    }
-
-    setTipping(true)
-
-    try {
-      const tipData = {
-        event_id: eventId,
-        amount: amount.toFixed(2),
-        tipper_name: tipperName.trim() || 'Anonymous',
-        message: tipperMessage.trim() || null,
-        created_at: new Date().toISOString(),
-        status: 'completed'
-      }
-
-      // Try to save to database
-      if (import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_URL !== 'https://your-project.supabase.co') {
-        const { error } = await supabase
-          .from(tipsTable)
-          .insert([tipData])
-
-        if (error) throw error
-      }
-
-      // Update local state immediately (optimistic update)
-      setTotalTips(prev => prev + amount)
-      setTipCount(prev => prev + 1)
-      setRecentTips(prev => [tipData, ...prev.slice(0, 4)])
-      
-      triggerConfetti()
-      toast.success(`Thank you for your $${amount.toFixed(2)} tip! 🎉`, {
-        duration: 4000,
-        icon: '🎉'
-      })
-
-      // Reset form
-      setSelectedAmount(null)
-      setCustomAmount('')
-      setTipperName('')
-      setTipperMessage('')
-
-      // In production, process Stripe payment here
-      // await processStripePayment(amount, tipData)
-      
-    } catch (error) {
-      console.error('Error processing tip:', error)
-      toast.error('Error processing tip. Please try again.')
-      // Revert optimistic update
-      setTotalTips(prev => prev - amount)
-      setTipCount(prev => prev - 1)
-    } finally {
-      setTipping(false)
-    }
+    // Amount validation happens before showing payment form
   }
+
+  const amount = selectedAmount || parseFloat(customAmount) || 0
 
   // Use event's custom tip presets if available
   const displayPresets = useMemo(() => {
@@ -328,32 +274,38 @@ function TipPage() {
           </button>
         </form>
 
-        {tipsLoading ? (
-          <div className="recent-tips">
-            <h3>Recent Tips</h3>
-            <div className="loading-tips">Loading tips...</div>
-          </div>
-        ) : recentTips.length > 0 ? (
-          <div className="recent-tips">
-            <h3>Recent Tips</h3>
-            <div className="tips-list">
-              {recentTips.map((tip, index) => (
-                <div key={tip.id || index} className="tip-item">
-                  <div className="tip-item-header">
-                    <span className="tipper-name">{tip.tipper_name || 'Anonymous'}</span>
-                    <span className="tip-amount">${parseFloat(tip.amount || 0).toFixed(2)}</span>
-                  </div>
-                  {tip.message && <div className="tip-message">{tip.message}</div>}
-                  <div className="tip-time">
-                    {tip.created_at ? new Date(tip.created_at).toLocaleTimeString() : 'Just now'}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : null}
+        {!tipsLoading && (
+          <>
+            <SocialProof
+              recentTips={recentTips}
+              totalTips={totalTips}
+              tipCount={tipCount}
+              showLiveCounter={true}
+            />
+
+            <ViralShare
+              url={`${window.location.origin}/tip/${eventId}`}
+              title={`Support ${event?.name || 'this event'}!`}
+              description={`Join ${event?.name || 'this event'} and show your support! 🎉`}
+              eventName={event?.name}
+              showQR={false}
+              onShare={(platform) => {
+                console.log(`Shared to ${platform}`)
+              }}
+            />
+          </>
+        )}
       </div>
     </div>
+  )
+}
+
+// Wrap with Stripe Elements provider
+function TipPage() {
+  return (
+    <Elements stripe={stripePromise}>
+      <TipPageContent />
+    </Elements>
   )
 }
 

@@ -1,0 +1,59 @@
+# TipNPlay Quick Cursor Commands
+
+## Performance
+Optimize TipNPlay for maximum performance: Add React.memo to all components, implement useCallback for event handlers, useMemo for expensive calculations, add code splitting for routes, optimize bundle size, and add performance monitoring.
+
+## Errors
+Find and fix all errors in TipNPlay: Check for linter errors, missing imports, undefined variables, type errors, and runtime errors. Fix all issues and ensure the code compiles without warnings.
+
+## TypeScript
+Convert TipNPlay to TypeScript: Add TypeScript configuration, convert all .jsx files to .tsx, add proper type definitions for all props and state, type all API responses, add interfaces for Supabase tables.
+
+## Testing
+Create comprehensive testing suite for TipNPlay: Add Jest and React Testing Library, write unit tests for all components, integration tests for API calls, E2E tests for critical flows.
+
+## Accessibility
+Make TipNPlay fully accessible: Add ARIA labels to all interactive elements, ensure keyboard navigation works, add focus indicators, implement screen reader support, ensure color contrast meets WCAG AA standards.
+
+## Mobile
+Optimize TipNPlay for mobile devices: Improve touch targets (min 44x44px), optimize form inputs for mobile keyboards, add swipe gestures, improve mobile navigation, optimize images for mobile.
+
+## SEO
+Optimize TipNPlay for SEO: Add meta tags to all pages, implement Open Graph tags, add structured data (JSON-LD), create sitemap.xml, optimize page titles and descriptions.
+
+## Security
+Harden TipNPlay security: Add input validation and sanitization, implement CSRF protection, add rate limiting, secure all API endpoints, add XSS protection, implement Content Security Policy.
+
+## Database
+Optimize Supabase database for TipNPlay: Add proper indexes to all tables, optimize queries, add database constraints, implement connection pooling, optimize RLS policies.
+
+## Real-time
+Enhance real-time features in TipNPlay: Optimize Supabase subscriptions, add real-time tip notifications, implement presence system for live events, add real-time analytics updates.
+
+## Analytics
+Add comprehensive analytics to TipNPlay: Integrate Google Analytics or Plausible, track page views, track user actions (event creation, tips), track conversion funnels, add custom events.
+
+## Payments
+Optimize Stripe payment flow in TipNPlay: Add payment retry logic, implement webhook handling, add payment status tracking, optimize checkout experience, add payment error handling.
+
+## QR Codes
+Enhance QR code system in TipNPlay: Add QR code analytics (scan tracking), implement QR code expiration, add custom QR code designs, optimize QR code generation performance.
+
+## Auth
+Implement user authentication in TipNPlay: Add Supabase Auth integration, create login/signup pages, implement email verification, add password reset flow, add social login.
+
+## Notifications
+Create notification system for TipNPlay: Add email notifications for new tips, implement push notifications, add in-app notifications, create notification preferences.
+
+## Admin
+Create admin dashboard for TipNPlay: Add user management, event management, tip management, analytics overview, system settings, user activity logs.
+
+## i18n
+Add internationalization to TipNPlay: Implement react-i18next, add translation files for multiple languages, add language switcher, localize all text content, format dates and numbers by locale.
+
+## Dark Mode
+Add dark mode to TipNPlay: Create theme context, add dark mode toggle, create dark theme CSS variables, implement theme persistence, add smooth theme transitions.
+
+## Documentation
+Generate comprehensive documentation for TipNPlay: Create API documentation, add component documentation with Storybook, create user guides, add developer documentation, create deployment guides.
+

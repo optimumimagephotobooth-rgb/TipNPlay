@@ -1,0 +1,140 @@
+.leaderboard {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 1.5rem 0;
+}
+
+.leaderboard-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  background: linear-gradient(135deg, #FFD700 0%, #fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+}
+
+.leaderboard-empty {
+  text-align: center;
+  padding: 2rem;
+  opacity: 0.7;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border-left: 4px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.leaderboard-item.top-three {
+  background: rgba(255, 255, 255, 0.08);
+  border-left-color: var(--rank-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.rank-badge {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+  color: #000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.item-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.leaderboard-item.top-three .item-name {
+  color: var(--rank-color);
+  font-weight: 700;
+}
+
+.item-message {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.item-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.value-amount {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #FFD700;
+}
+
+.leaderboard-item.top-three .value-amount {
+  color: var(--rank-color);
+  font-size: 1.3rem;
+}
+
+.value-count {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.leaderboard-footer {
+  text-align: center;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .leaderboard-item {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+  
+  .rank-badge {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+  
+  .item-name {
+    font-size: 0.9rem;
+  }
+  
+  .value-amount {
+    font-size: 1rem;
+  }
+}
+

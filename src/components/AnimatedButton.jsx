@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 
 /**
  * Animated button with hover and tap effects
+ * Supports both button and Link (from react-router-dom)
  */
 const buttonVariants = {
   hover: {
@@ -22,19 +24,44 @@ function AnimatedButton({
   onClick,
   disabled = false,
   variant = 'primary',
+  to,
+  as,
   ...props 
 }) {
   const baseClasses = `btn btn-${variant} ${className}`
+  const motionProps = {
+    variants: buttonVariants,
+    whileHover: disabled ? {} : 'hover',
+    whileTap: disabled ? {} : 'tap',
+    className: baseClasses,
+    ...props
+  }
+  
+  // If 'to' prop is provided, render as Link
+  if (to) {
+    return (
+      <motion.div
+        variants={buttonVariants}
+        whileHover={disabled ? {} : 'hover'}
+        whileTap={disabled ? {} : 'tap'}
+      >
+        <Link
+          to={to}
+          className={baseClasses}
+          onClick={disabled ? (e) => e.preventDefault() : onClick}
+          {...props}
+        >
+          {children}
+        </Link>
+      </motion.div>
+    )
+  }
   
   return (
     <motion.button
-      variants={buttonVariants}
-      whileHover={disabled ? {} : 'hover'}
-      whileTap={disabled ? {} : 'tap'}
+      {...motionProps}
       onClick={onClick}
       disabled={disabled}
-      className={baseClasses}
-      {...props}
     >
       {children}
     </motion.button>

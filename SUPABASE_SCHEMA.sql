@@ -45,10 +45,47 @@ CREATE INDEX IF NOT EXISTS idx_events_created_at ON events(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_tips_event_id ON tips(event_id);
 CREATE INDEX IF NOT EXISTS idx_tips_created_at ON tips(created_at DESC);
 
+-- Payout profiles table
+CREATE TABLE IF NOT EXISTS payout_profiles (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  method_type TEXT NOT NULL CHECK (method_type IN ('bank', 'stripe', 'paypal', 'venmo', 'cashapp')),
+  is_default BOOLEAN DEFAULT false,
+  account_name TEXT,
+  account_details JSONB NOT NULL,
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'pending', 'verified', 'suspended')),
+  verified_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Payouts table
+CREATE TABLE IF NOT EXISTS payouts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  payout_profile_id UUID REFERENCES payout_profiles(id),
+  amount DECIMAL(10, 2) NOT NULL CHECK (amount > 0),
+  currency TEXT DEFAULT 'USD',
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
+  method_type TEXT NOT NULL,
+  transaction_id TEXT,
+  processed_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for payout tables
+CREATE INDEX IF NOT EXISTS idx_payout_profiles_user_id ON payout_profiles(user_id);
+CREATE INDEX IF NOT EXISTS idx_payout_profiles_default ON payout_profiles(user_id, is_default) WHERE is_default = true;
+CREATE INDEX IF NOT EXISTS idx_payouts_user_id ON payouts(user_id);
+CREATE INDEX IF NOT EXISTS idx_payouts_status ON payouts(status);
+CREATE INDEX IF NOT EXISTS idx_payouts_created_at ON payouts(created_at DESC);
+
 -- Enable Row Level Security (RLS)
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tips ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payout_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payouts ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for users
 CREATE POLICY "Users can view own profile"

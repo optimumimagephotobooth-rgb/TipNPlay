@@ -1,9 +1,11 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import QRCodeDisplay from '../components/QRCodeDisplay'
 import QRCodeModal from '../components/QRCodeModal'
+import ViralShare from '../components/ViralShare'
+import { createEventCheckout } from '../utils/payments'
 import { supabase, eventsTable } from '../lib/supabase'
 import toast, { Toaster } from 'react-hot-toast'
 import './CreateEvent.css'
@@ -14,6 +16,7 @@ function CreateEventForm() {
   const stripe = useStripe()
   const elements = useElements()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -164,6 +167,18 @@ function CreateEventForm() {
               </button>
             </div>
           </div>
+
+          <ViralShare
+            url={tipUrl}
+            title={`Support ${createdEvent.name || 'this event'}!`}
+            description={`Join ${createdEvent.name || 'this event'} and show your support! 🎉`}
+            eventName={createdEvent.name}
+            showQR={true}
+            onShare={(platform) => {
+              // Track share analytics
+              console.log(`Shared to ${platform}`)
+            }}
+          />
 
           <div className="qr-section">
             <QRCodeDisplay

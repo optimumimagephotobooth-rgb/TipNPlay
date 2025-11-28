@@ -1,0 +1,128 @@
+.viral-share {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  margin: 2rem 0;
+}
+
+.viral-share-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, #FFD700 0%, #fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.viral-share-subtitle {
+  opacity: 0.8;
+  margin: 0 0 1.5rem 0;
+  font-size: 1rem;
+}
+
+.share-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.share-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.share-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--share-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.share-platform-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.copy-link-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.copy-link-btn {
+  padding: 0.75rem 2rem;
+  background: #FFD700;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 150px;
+}
+
+.copy-link-btn:hover {
+  background: #ffed4e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.copy-link-btn.copied {
+  background: #4CAF50;
+  color: #fff;
+}
+
+.share-hint {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin: 0;
+}
+
+.qr-share-hint {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid #FFD700;
+}
+
+.qr-share-hint p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .share-buttons-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .share-button {
+    padding: 0.75rem;
+  }
+  
+  .share-platform-name {
+    font-size: 0.8rem;
+  }
+}
+

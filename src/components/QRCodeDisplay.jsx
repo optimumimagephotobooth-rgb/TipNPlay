@@ -98,7 +98,6 @@ function QRCodeDisplay({
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
-      ref={qrRef}
     >
       {showTitle && (
         <motion.h4 
@@ -116,7 +115,7 @@ function QRCodeDisplay({
         whileHover={{ scale: 1.05 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
-        <div className="qr-code-container">
+        <div className="qr-code-container" ref={qrRef}>
           <QRCodeSVG 
             value={value} 
             size={size} 

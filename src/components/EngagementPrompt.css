@@ -1,0 +1,127 @@
+.engagement-prompt {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid var(--prompt-color);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin: 1rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.engagement-prompt::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--prompt-color), transparent);
+}
+
+.prompt-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.prompt-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.prompt-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--prompt-color);
+}
+
+.prompt-message {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.prompt-cta {
+  padding: 0.6rem 1.5rem;
+  background: var(--prompt-color);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.prompt-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.prompt-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.prompt-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+@media (max-width: 768px) {
+  .engagement-prompt {
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .prompt-icon {
+    font-size: 2rem;
+  }
+  
+  .prompt-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .prompt-cta {
+    flex: 1;
+  }
+}
+

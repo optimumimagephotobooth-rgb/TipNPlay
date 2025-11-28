@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import FadeIn from '../components/FadeIn'
 import StaggerChildren, { itemVariants } from '../components/StaggerChildren'
 import AnimatedButton from '../components/AnimatedButton'
+import BackgroundVideo from '../components/BackgroundVideo'
 import './Home.css'
 
 function Home() {
@@ -19,8 +20,16 @@ function Home() {
   return (
     <div className="home">
       <div className="hero-section">
+        {/* Optimized background video with fallback */}
+        <BackgroundVideo
+          src="/videos/hero-background.mp4"
+          poster="/images/hero-poster.jpg"
+          fallbackImage="/images/hero-fallback.jpg"
+          overlay={true}
+          opacity={0.3}
+        />
+        {/* CSS animation fallback (shows if video fails) */}
         <div className="hero-bg-animated"></div>
-        <div className="hero-overlay"></div>
         <div className="hero-content">
           <div className="container">
             <FadeIn delay={0.2}>
@@ -41,7 +50,6 @@ function Home() {
             <FadeIn delay={0.6}>
               <div className="hero-actions">
                 <AnimatedButton 
-                  as={Link}
                   to="/create-event"
                   variant="primary"
                 >

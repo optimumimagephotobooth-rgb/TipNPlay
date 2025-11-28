@@ -1,0 +1,179 @@
+.payout-methods-list {
+  margin: 2rem 0;
+}
+
+.methods-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.methods-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: #FFD700;
+}
+
+.btn-add {
+  padding: 0.75rem 1.5rem;
+  background: #FFD700;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-add:hover {
+  background: #ffed4e;
+  transform: translateY(-2px);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+}
+
+.methods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.method-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s;
+}
+
+.method-card.default {
+  border-color: #FFD700;
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.method-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.method-icon {
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.method-card.default .method-icon {
+  background: #FFD700;
+}
+
+.method-info {
+  flex: 1;
+}
+
+.method-info h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.method-details {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin: 0;
+  font-family: monospace;
+}
+
+.default-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #FFD700;
+  color: #000;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.method-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-action:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-edit {
+  border-color: #4ECDC4;
+}
+
+.btn-edit:hover {
+  background: rgba(78, 205, 196, 0.2);
+  border-color: #4ECDC4;
+}
+
+.btn-delete {
+  border-color: #FF6B6B;
+}
+
+.btn-delete:hover {
+  background: rgba(255, 107, 107, 0.2);
+  border-color: #FF6B6B;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .methods-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .methods-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .btn-add {
+    width: 100%;
+  }
+}
+
