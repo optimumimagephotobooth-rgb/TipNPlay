@@ -1,20 +1,29 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
-import Home from './pages/Home'
-import CreateEvent from './pages/CreateEvent'
-import DJDashboard from './pages/DJDashboard'
-import TipPage from './pages/TipPage'
+import ErrorBoundary from './components/ErrorBoundary'
+import LoadingSpinner from './components/LoadingSpinner'
+
+// Lazy load pages for code splitting and faster initial load
+const Home = lazy(() => import('./pages/Home'))
+const CreateEvent = lazy(() => import('./pages/CreateEvent'))
+const DJDashboard = lazy(() => import('./pages/DJDashboard'))
+const TipPage = lazy(() => import('./pages/TipPage'))
 
 function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/create-event" element={<CreateEvent />} />
-        <Route path="/dj-dashboard" element={<DJDashboard />} />
-        <Route path="/tip/:eventId" element={<TipPage />} />
-      </Routes>
-    </Layout>
+    <ErrorBoundary>
+      <Layout>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/create-event" element={<CreateEvent />} />
+            <Route path="/dj-dashboard" element={<DJDashboard />} />
+            <Route path="/tip/:eventId" element={<TipPage />} />
+          </Routes>
+        </Suspense>
+      </Layout>
+    </ErrorBoundary>
   )
 }
 

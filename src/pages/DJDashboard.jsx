@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo, memo } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { format, subDays } from 'date-fns'
@@ -9,7 +9,7 @@ import { supabase, eventsTable, tipsTable } from '../lib/supabase'
 import toast, { Toaster } from 'react-hot-toast'
 import './DJDashboard.css'
 
-function DJDashboard() {
+const DJDashboard = memo(function DJDashboard() {
   const navigate = useNavigate()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
@@ -27,7 +27,7 @@ function DJDashboard() {
     }
   }, [selectedEvent, timeRange])
 
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from(eventsTable)
@@ -73,7 +73,7 @@ function DJDashboard() {
     }
   }
 
-  const loadAnalytics = async (eventId) => {
+  const loadAnalytics = useCallback(async (eventId) => {
     try {
       const { data, error } = await supabase
         .from(tipsTable)
@@ -93,7 +93,7 @@ function DJDashboard() {
         return tipDate >= startDate
       })
 
-      // Group by day
+      // Group by day (optimized)
       const dailyData = {}
       filteredData.forEach(tip => {
         const date = format(new Date(tip.created_at), 'MMM dd')
@@ -106,13 +106,16 @@ function DJDashboard() {
 
       const chartData = Object.values(dailyData)
 
-      // Hourly distribution
-      const hourlyData = Array(24).fill(0).map((_, hour) => ({
+      // Hourly distribution (optimized)
+      const hourlyCounts = new Array(24).fill(0)
+      filteredData.forEach(tip => {
+        const hour = new Date(tip.created_at).getHours()
+        hourlyCounts[hour]++
+      })
+      
+      const hourlyData = hourlyCounts.map((count, hour) => ({
         hour: `${hour}:00`,
-        count: filteredData.filter(tip => {
-          const tipHour = new Date(tip.created_at).getHours()
-          return tipHour === hour
-        }).length
+        count
       }))
 
       setAnalytics({
@@ -142,15 +145,21 @@ function DJDashboard() {
         }))
       })
     }
-  }
+  }, [timeRange])
 
-  const getTipUrl = (eventId) => {
+  useEffect(() => {
+    if (selectedEvent) {
+      loadAnalytics(selectedEvent.id)
+    }
+  }, [selectedEvent, loadAnalytics])
+
+  const getTipUrl = useCallback((eventId) => {
     return `${window.location.origin}/tip/${eventId}`
-  }
+  }, [])
 
-  const handleShare = (platform, url) => {
+  const handleShare = useCallback((platform, url) => {
     toast.success(`Sharing to ${platform}...`)
-  }
+  }, [])
 
   if (loading) {
     return (
@@ -162,8 +171,15 @@ function DJDashboard() {
     )
   }
 
-  const totalTips = events.reduce((sum, e) => sum + (e.totalTips || 0), 0)
-  const totalTipCount = events.reduce((sum, e) => sum + (e.tipCount || 0), 0)
+  // Memoize computed values
+  const totalTips = useMemo(() => 
+    events.reduce((sum, e) => sum + (e.totalTips || 0), 0),
+    [events]
+  )
+  const totalTipCount = useMemo(() => 
+    events.reduce((sum, e) => sum + (e.tipCount || 0), 0),
+    [events]
+  )
 
   return (
     <div className="dj-dashboard">

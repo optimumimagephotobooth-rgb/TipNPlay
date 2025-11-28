@@ -1,19 +1,34 @@
+import { memo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import './Home.css'
 
-function Home() {
-  const handleShareWhatsApp = () => {
+const Home = memo(function Home() {
+  const handleShareWhatsApp = useCallback(() => {
     const url = window.location.href
     window.open(`https://wa.me/?text=${encodeURIComponent(`Check out TipnPlay: ${url}`)}`, '_blank')
-  }
+  }, [])
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href)
-    alert('Link copied to clipboard!')
-  }
+  const handleCopyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      toast.success('Link copied to clipboard!')
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = window.location.href
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      toast.success('Link copied!')
+    }
+  }, [])
 
   return (
     <div className="home">
+      <Toaster position="top-center" />
       <div className="hero-section">
         <div className="hero-bg-animated"></div>
         <div className="hero-overlay"></div>

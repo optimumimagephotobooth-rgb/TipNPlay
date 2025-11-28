@@ -1,7 +1,8 @@
+import { memo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import './Layout.css'
 
-function Layout({ children }) {
+const Layout = memo(function Layout({ children }) {
   const location = useLocation()
   const isTipPage = location.pathname.startsWith('/tip/')
 
