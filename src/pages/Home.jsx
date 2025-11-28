@@ -15,15 +15,7 @@ function Home() {
   return (
     <div className="home">
       <div className="hero-section">
-        <video 
-          className="hero-bg" 
-          autoPlay 
-          loop 
-          muted 
-          playsInline
-        >
-          <source src="/neon-bg.mp4" type="video/mp4" />
-        </video>
+        <div className="hero-bg-animated"></div>
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <div className="container">
