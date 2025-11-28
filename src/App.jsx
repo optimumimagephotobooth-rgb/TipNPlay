@@ -3,6 +3,7 @@ import Layout from './components/Layout'
 import Home from './pages/Home'
 import CreateEvent from './pages/CreateEvent'
 import DJDashboard from './pages/DJDashboard'
+import TipPage from './pages/TipPage'
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/create-event" element={<CreateEvent />} />
         <Route path="/dj-dashboard" element={<DJDashboard />} />
+        <Route path="/tip/:eventId" element={<TipPage />} />
       </Routes>
     </Layout>
   )

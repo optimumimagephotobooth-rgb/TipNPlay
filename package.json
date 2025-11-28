@@ -14,7 +14,13 @@
     "react-router-dom": "^6.20.0",
     "@stripe/stripe-js": "^2.1.11",
     "@stripe/react-stripe-js": "^2.4.0",
-    "@supabase/supabase-js": "^2.38.4"
+    "@supabase/supabase-js": "^2.38.4",
+    "qrcode.react": "^3.1.0",
+    "canvas-confetti": "^1.9.2",
+    "react-hot-toast": "^2.4.1",
+    "date-fns": "^2.30.0",
+    "recharts": "^2.10.3",
+    "react-share": "^4.4.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",

@@ -3,6 +3,12 @@ import './Layout.css'
 
 function Layout({ children }) {
   const location = useLocation()
+  const isTipPage = location.pathname.startsWith('/tip/')
+
+  // Hide header/footer on tip page for cleaner guest experience
+  if (isTipPage) {
+    return <div className="layout">{children}</div>
+  }
 
   return (
     <div className="layout">
