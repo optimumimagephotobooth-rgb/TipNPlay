@@ -1,6 +1,8 @@
 language = "nodejs"
 run = "npm run dev"
 
+modules = ["nodejs-20"]
+
 [deploy]
 run = ["sh", "-c", "npm run build"]
 
