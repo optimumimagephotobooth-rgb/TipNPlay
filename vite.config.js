@@ -6,7 +6,10 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true, // Allow external connections (needed for Replit)
-    strictPort: false // Allow port fallback
+    strictPort: false, // Allow port fallback if 3000 is taken
+    hmr: {
+      clientPort: 443 // Replit uses HTTPS on port 443
+    }
   },
   base: '/',
   build: {

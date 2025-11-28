@@ -5,9 +5,12 @@ modules = ["nodejs-20"]
 
 [deploy]
 run = ["sh", "-c", "npm run build"]
+publishDir = "dist"
 
 [env]
 VITE_STRIPE_PUBLISHABLE_KEY = "pk_test_YOUR_KEY_HERE"
+VITE_SUPABASE_URL = "https://your-project.supabase.co"
+VITE_SUPABASE_ANON_KEY = "your-anon-key-here"
 
 [packager]
 language = "nodejs"
@@ -28,9 +31,7 @@ pattern = "**/{*.js,*.jsx,*.ts,*.tsx}"
 start = "typescript-language-server --stdio"
 
 [interpreter]
-command = [
-  "node"
-]
+command = ["node"]
 
 [unitTest]
 language = "nodejs"
