@@ -20,7 +20,9 @@
     "react-hot-toast": "^2.4.1",
     "date-fns": "^2.30.0",
     "recharts": "^2.10.3",
-    "react-share": "^4.4.1"
+    "react-share": "^4.4.1",
+    "framer-motion": "^10.16.16",
+    "lottie-react": "^2.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",

@@ -1,0 +1,163 @@
+.supabase-status {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  backdrop-filter: blur(10px);
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.status-icon {
+  font-size: 1.5rem;
+}
+
+.status-header h3 {
+  margin: 0;
+  flex: 1;
+  font-size: 1.2rem;
+}
+
+.refresh-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.status-body {
+  margin-top: 1rem;
+}
+
+.status-message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.status-message p {
+  margin: 0.25rem 0;
+}
+
+.status-message.success {
+  color: #4CAF50;
+}
+
+.status-message.error {
+  color: #F44336;
+}
+
+.status-details {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.status-details code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.setup-steps {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.setup-steps h4 {
+  margin-top: 0;
+  color: #FFD700;
+}
+
+.setup-steps ol,
+.setup-steps ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.setup-steps li {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.setup-steps code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.setup-steps a {
+  color: #FFD700;
+  text-decoration: underline;
+}
+
+.error-details {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(244, 67, 54, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid #F44336;
+}
+
+.error-details .hint {
+  margin-top: 0.5rem;
+  color: #FFD700;
+}
+
+.troubleshooting {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.troubleshooting h4 {
+  margin-top: 0;
+  color: #FFD700;
+}
+
+.troubleshooting ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.troubleshooting li {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #FFD700;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+

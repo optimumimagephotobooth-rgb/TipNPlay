@@ -1,112 +1,172 @@
-import { memo, useCallback } from 'react'
+import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import toast from 'react-hot-toast'
-import { Toaster } from 'react-hot-toast'
+import FadeIn from '../components/FadeIn'
+import StaggerChildren, { itemVariants } from '../components/StaggerChildren'
+import AnimatedButton from '../components/AnimatedButton'
 import './Home.css'
 
-const Home = memo(function Home() {
-  const handleShareWhatsApp = useCallback(() => {
+function Home() {
+  const handleShareWhatsApp = () => {
     const url = window.location.href
     window.open(`https://wa.me/?text=${encodeURIComponent(`Check out TipnPlay: ${url}`)}`, '_blank')
-  }, [])
+  }
 
-  const handleCopyLink = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href)
-      toast.success('Link copied to clipboard!')
-    } catch (err) {
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea')
-      textArea.value = window.location.href
-      document.body.appendChild(textArea)
-      textArea.select()
-      document.execCommand('copy')
-      document.body.removeChild(textArea)
-      toast.success('Link copied!')
-    }
-  }, [])
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href)
+    alert('Link copied to clipboard!')
+  }
 
   return (
     <div className="home">
-      <Toaster position="top-center" />
       <div className="hero-section">
         <div className="hero-bg-animated"></div>
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <div className="container">
-            <h1 className="hero-title">Live Tips. Live Energy.</h1>
-            <p className="hero-subtitle">
-              The fastest micro-tipping platform for DJs, hosts & entertainers.
-            </p>
-            <div className="hero-actions">
-              <Link to="/create-event" className="btn btn-primary">
-                Get Started
-              </Link>
-              <div className="share-buttons">
-                <button 
-                  onClick={handleShareWhatsApp} 
-                  className="btn btn-secondary"
+            <FadeIn delay={0.2}>
+              <motion.h1 
+                className="hero-title"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
+              >
+                Live Tips. Live Energy.
+              </motion.h1>
+            </FadeIn>
+            <FadeIn delay={0.4}>
+              <p className="hero-subtitle">
+                The fastest micro-tipping platform for DJs, hosts & entertainers.
+              </p>
+            </FadeIn>
+            <FadeIn delay={0.6}>
+              <div className="hero-actions">
+                <AnimatedButton 
+                  as={Link}
+                  to="/create-event"
+                  variant="primary"
                 >
-                  <img src="/whatsapp.svg" alt="WhatsApp" />
-                  Share on WhatsApp
-                </button>
-                <button 
-                  onClick={handleCopyLink} 
-                  className="btn btn-secondary"
-                >
-                  <img src="/copy.svg" alt="Copy" />
-                  Copy Link
-                </button>
+                  Get Started
+                </AnimatedButton>
+                <div className="share-buttons">
+                  <AnimatedButton 
+                    onClick={handleShareWhatsApp} 
+                    variant="secondary"
+                  >
+                    <img src="/whatsapp.svg" alt="WhatsApp" />
+                    Share on WhatsApp
+                  </AnimatedButton>
+                  <AnimatedButton 
+                    onClick={handleCopyLink} 
+                    variant="secondary"
+                  >
+                    <img src="/copy.svg" alt="Copy" />
+                    Copy Link
+                  </AnimatedButton>
+                </div>
               </div>
-            </div>
+            </FadeIn>
           </div>
         </div>
       </div>
 
       <section className="how-it-works">
         <div className="container">
-          <h2>How It Works</h2>
-          <div className="steps">
-            <div className="step">
-              <div className="step-number">1</div>
-              <h3>Create Event</h3>
-              <p>Set up your tipping event in seconds</p>
+          <FadeIn delay={0.2}>
+            <h2>How It Works</h2>
+          </FadeIn>
+          <StaggerChildren>
+            <div className="steps">
+              <motion.div className="step" variants={itemVariants}>
+                <motion.div 
+                  className="step-number"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  1
+                </motion.div>
+                <h3>Create Event</h3>
+                <p>Set up your tipping event in seconds</p>
+              </motion.div>
+              <motion.div className="step" variants={itemVariants}>
+                <motion.div 
+                  className="step-number"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  2
+                </motion.div>
+                <h3>Share Link</h3>
+                <p>Share your unique tipping link with your audience</p>
+              </motion.div>
+              <motion.div className="step" variants={itemVariants}>
+                <motion.div 
+                  className="step-number"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  3
+                </motion.div>
+                <h3>Receive Tips</h3>
+                <p>Get instant payouts directly to your account</p>
+              </motion.div>
             </div>
-            <div className="step">
-              <div className="step-number">2</div>
-              <h3>Share Link</h3>
-              <p>Share your unique tipping link with your audience</p>
-            </div>
-            <div className="step">
-              <div className="step-number">3</div>
-              <h3>Receive Tips</h3>
-              <p>Get instant payouts directly to your account</p>
-            </div>
-          </div>
+          </StaggerChildren>
         </div>
       </section>
 
       <section className="key-benefits">
         <div className="container">
-          <h2>Key Benefits</h2>
-          <div className="benefits-grid">
-            <div className="benefit">
-              <span className="checkmark">✔</span>
-              <span>Instant payouts — DJs keep 100%</span>
+          <FadeIn delay={0.2}>
+            <h2>Key Benefits</h2>
+          </FadeIn>
+          <StaggerChildren>
+            <div className="benefits-grid">
+              <motion.div className="benefit" variants={itemVariants}>
+                <motion.span 
+                  className="checkmark"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.3, type: "spring" }}
+                >
+                  ✔
+                </motion.span>
+                <span>Instant payouts — DJs keep 100%</span>
+              </motion.div>
+              <motion.div className="benefit" variants={itemVariants}>
+                <motion.span 
+                  className="checkmark"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.4, type: "spring" }}
+                >
+                  ✔
+                </motion.span>
+                <span>One-tap tipping for guests</span>
+              </motion.div>
+              <motion.div className="benefit" variants={itemVariants}>
+                <motion.span 
+                  className="checkmark"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.5, type: "spring" }}
+                >
+                  ✔
+                </motion.span>
+                <span>Perfect for clubs, weddings, parties & festivals</span>
+              </motion.div>
+              <motion.div className="benefit" variants={itemVariants}>
+                <motion.span 
+                  className="checkmark"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.6, type: "spring" }}
+                >
+                  ✔
+                </motion.span>
+                <span>No account needed for tippers</span>
+              </motion.div>
             </div>
-            <div className="benefit">
-              <span className="checkmark">✔</span>
-              <span>One-tap tipping for guests</span>
-            </div>
-            <div className="benefit">
-              <span className="checkmark">✔</span>
-              <span>Perfect for clubs, weddings, parties & festivals</span>
-            </div>
-            <div className="benefit">
-              <span className="checkmark">✔</span>
-              <span>No account needed for tippers</span>
-            </div>
-          </div>
+          </StaggerChildren>
         </div>
       </section>
     </div>

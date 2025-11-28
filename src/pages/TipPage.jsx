@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, memo } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import confetti from 'canvas-confetti'
 import toast, { Toaster } from 'react-hot-toast'
@@ -126,15 +126,11 @@ function TipPage() {
   }, [eventId, loadEvent, loadTips])
 
   const triggerConfetti = useCallback(() => {
-    // Use requestAnimationFrame for smooth animation
-    requestAnimationFrame(() => {
-      confetti({
-        particleCount: 50,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#FFD700', '#25D366', '#FF6B6B'],
-        disableForReducedMotion: true // Respect user preferences
-      })
+    confetti({
+      particleCount: 50,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#FFD700', '#25D366', '#FF6B6B']
     })
   }, [])
 

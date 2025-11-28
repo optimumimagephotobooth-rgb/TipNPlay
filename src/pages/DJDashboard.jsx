@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, memo } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { format, subDays } from 'date-fns'
@@ -9,7 +9,7 @@ import { supabase, eventsTable, tipsTable } from '../lib/supabase'
 import toast, { Toaster } from 'react-hot-toast'
 import './DJDashboard.css'
 
-const DJDashboard = memo(function DJDashboard() {
+function DJDashboard() {
   const navigate = useNavigate()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
@@ -27,7 +27,7 @@ const DJDashboard = memo(function DJDashboard() {
     }
   }, [selectedEvent, timeRange])
 
-  const loadEvents = useCallback(async () => {
+  const loadEvents = async () => {
     try {
       const { data, error } = await supabase
         .from(eventsTable)
@@ -73,7 +73,7 @@ const DJDashboard = memo(function DJDashboard() {
     }
   }
 
-  const loadAnalytics = useCallback(async (eventId) => {
+  const loadAnalytics = async (eventId) => {
     try {
       const { data, error } = await supabase
         .from(tipsTable)
@@ -93,7 +93,7 @@ const DJDashboard = memo(function DJDashboard() {
         return tipDate >= startDate
       })
 
-      // Group by day (optimized)
+      // Group by day
       const dailyData = {}
       filteredData.forEach(tip => {
         const date = format(new Date(tip.created_at), 'MMM dd')
@@ -106,16 +106,13 @@ const DJDashboard = memo(function DJDashboard() {
 
       const chartData = Object.values(dailyData)
 
-      // Hourly distribution (optimized)
-      const hourlyCounts = new Array(24).fill(0)
-      filteredData.forEach(tip => {
-        const hour = new Date(tip.created_at).getHours()
-        hourlyCounts[hour]++
-      })
-      
-      const hourlyData = hourlyCounts.map((count, hour) => ({
+      // Hourly distribution
+      const hourlyData = Array(24).fill(0).map((_, hour) => ({
         hour: `${hour}:00`,
-        count
+        count: filteredData.filter(tip => {
+          const tipHour = new Date(tip.created_at).getHours()
+          return tipHour === hour
+        }).length
       }))
 
       setAnalytics({
@@ -145,21 +142,15 @@ const DJDashboard = memo(function DJDashboard() {
         }))
       })
     }
-  }, [timeRange])
+  }
 
-  useEffect(() => {
-    if (selectedEvent) {
-      loadAnalytics(selectedEvent.id)
-    }
-  }, [selectedEvent, loadAnalytics])
-
-  const getTipUrl = useCallback((eventId) => {
+  const getTipUrl = (eventId) => {
     return `${window.location.origin}/tip/${eventId}`
-  }, [])
+  }
 
-  const handleShare = useCallback((platform, url) => {
+  const handleShare = (platform, url) => {
     toast.success(`Sharing to ${platform}...`)
-  }, [])
+  }
 
   if (loading) {
     return (
@@ -171,20 +162,14 @@ const DJDashboard = memo(function DJDashboard() {
     )
   }
 
-  // Memoize computed values
-  const totalTips = useMemo(() => 
-    events.reduce((sum, e) => sum + (e.totalTips || 0), 0),
-    [events]
-  )
-  const totalTipCount = useMemo(() => 
-    events.reduce((sum, e) => sum + (e.tipCount || 0), 0),
-    [events]
-  )
+  const totalTips = events.reduce((sum, e) => sum + (e.totalTips || 0), 0)
+  const totalTipCount = events.reduce((sum, e) => sum + (e.tipCount || 0), 0)
 
   return (
     <div className="dj-dashboard">
       <Toaster />
       <div className="container">
+        <SupabaseStatus />
         <div className="dashboard-header">
           <h1>DJ Dashboard</h1>
           <Link to="/create-event" className="btn btn-primary">
