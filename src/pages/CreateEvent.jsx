@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
-import { QRCodeSVG } from 'qrcode.react'
+import QRCodeDisplay from '../components/QRCodeDisplay'
+import QRCodeModal from '../components/QRCodeModal'
 import { supabase, eventsTable } from '../lib/supabase'
 import toast, { Toaster } from 'react-hot-toast'
 import './CreateEvent.css'
@@ -165,36 +166,17 @@ function CreateEventForm() {
           </div>
 
           <div className="qr-section">
-            <label>QR Code:</label>
-            <div className="qr-container">
-              <QRCodeSVG value={tipUrl} size={200} level="H" />
-            </div>
-            <button 
-              onClick={() => {
-                const svg = document.querySelector('.qr-container svg')
-                const svgData = new XMLSerializer().serializeToString(svg)
-                const canvas = document.createElement('canvas')
-                const ctx = canvas.getContext('2d')
-                const img = new Image()
-                img.onload = () => {
-                  canvas.width = img.width
-                  canvas.height = img.height
-                  ctx.drawImage(img, 0, 0)
-                  canvas.toBlob((blob) => {
-                    const url = URL.createObjectURL(blob)
-                    const a = document.createElement('a')
-                    a.href = url
-                    a.download = `tipnplay-qr-${createdEvent.id}.png`
-                    a.click()
-                    toast.success('QR code downloaded!')
-                  })
-                }
-                img.src = 'data:image/svg+xml;base64,' + btoa(svgData)
+            <QRCodeDisplay
+              value={tipUrl}
+              size={250}
+              title="Share Your Tipping Page"
+              showDownload={true}
+              eventName={createdEvent.name || createdEvent.id}
+              customColors={{
+                fgColor: eventData.primary_color || '#000000',
+                bgColor: '#FFFFFF'
               }}
-              className="download-qr-btn"
-            >
-              Download QR Code
-            </button>
+            />
           </div>
 
           <div className="success-actions">

@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { format, subDays } from 'date-fns'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { QRCodeSVG } from 'qrcode.react'
+import QRCodeDisplay from '../components/QRCodeDisplay'
+import QRCodeModal from '../components/QRCodeModal'
 import { FacebookShareButton, TwitterShareButton, WhatsAppShareButton, EmailShareButton } from 'react-share'
 import { supabase, eventsTable, tipsTable } from '../lib/supabase'
 import toast, { Toaster } from 'react-hot-toast'
@@ -16,6 +17,7 @@ function DJDashboard() {
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [analytics, setAnalytics] = useState(null)
   const [timeRange, setTimeRange] = useState('7d') // 7d, 30d, all
+  const [showQRModal, setShowQRModal] = useState(false)
 
   useEffect(() => {
     loadEvents()
@@ -363,11 +365,36 @@ function DJDashboard() {
                       </EmailShareButton>
                     </div>
                     <div className="qr-section">
-                      <h4>QR Code</h4>
-                      <div className="qr-display">
-                        <QRCodeSVG value={getTipUrl(selectedEvent.id)} size={150} level="H" />
-                      </div>
+                      <QRCodeDisplay
+                        value={getTipUrl(selectedEvent.id)}
+                        size={200}
+                        title="Event QR Code"
+                        showDownload={true}
+                        eventName={selectedEvent.name || selectedEvent.id}
+                        customColors={{
+                          fgColor: selectedEvent.custom_colors?.primary || '#000000',
+                          bgColor: '#FFFFFF'
+                        }}
+                      />
+                      <button 
+                        onClick={() => setShowQRModal(true)}
+                        className="btn btn-secondary"
+                        style={{ marginTop: '1rem', width: '100%' }}
+                      >
+                        🔍 View Full Size
+                      </button>
                     </div>
+                    
+                    <QRCodeModal
+                      isOpen={showQRModal}
+                      onClose={() => setShowQRModal(false)}
+                      value={getTipUrl(selectedEvent.id)}
+                      eventName={selectedEvent.name || selectedEvent.id}
+                      customColors={{
+                        fgColor: selectedEvent.custom_colors?.primary || '#000000',
+                        bgColor: '#FFFFFF'
+                      }}
+                    />
                   </div>
                 </>
               )}
