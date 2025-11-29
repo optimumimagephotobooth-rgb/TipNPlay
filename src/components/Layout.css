@@ -46,6 +46,35 @@
   opacity: 0.8;
 }
 
+.auth-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  cursor: pointer;
+  border: none;
+}
+
+.login-btn {
+  background: #667eea;
+  color: white;
+  text-decoration: none;
+}
+
+.login-btn:hover {
+  background: #5568d3;
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .theme-toggle {
   background: none;
   border: none;

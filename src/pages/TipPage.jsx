@@ -5,6 +5,14 @@ import toast, { Toaster } from 'react-hot-toast'
 import { supabase, eventsTable, tipsTable } from '../lib/supabase'
 import SocialProof from '../components/SocialProof'
 import ViralShare from '../components/ViralShare'
+import LiveReactions from '../components/LiveReactions'
+import TipStreak from '../components/TipStreak'
+import TipLeaderboard from '../components/TipLeaderboard'
+import TipGoals from '../components/TipGoals'
+import TrendingBadge from '../components/TrendingBadge'
+import { celebrateTip } from '../components/TipAnimations'
+import { sanitizeInput } from '../utils/sanitize'
+import { trackTip } from '../utils/analytics'
 import './TipPage.css'
 
 // Cache for event data (5 minutes)
@@ -114,11 +122,12 @@ function TipPageContent() {
           },
           (payload) => {
             const newTip = payload.new
-            setTotalTips(prev => prev + parseFloat(newTip.amount || 0))
+            const tipAmount = parseFloat(newTip.amount || 0)
+            setTotalTips(prev => prev + tipAmount)
             setTipCount(prev => prev + 1)
             setRecentTips(prev => [newTip, ...prev.slice(0, 4)])
-            triggerConfetti()
-            toast.success(`New tip: $${parseFloat(newTip.amount).toFixed(2)}! 🎉`)
+            triggerConfetti(tipAmount)
+            toast.success(`New tip: $${tipAmount.toFixed(2)}! 🎉`)
           }
         )
         .subscribe()
@@ -129,13 +138,9 @@ function TipPageContent() {
     }
   }, [eventId, loadEvent, loadTips])
 
-  const triggerConfetti = useCallback(() => {
-    confetti({
-      particleCount: 50,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#FFD700', '#25D366', '#FF6B6B']
-    })
+  const triggerConfetti = useCallback((amount) => {
+    // Use enhanced celebration based on tip amount
+    celebrateTip(amount || 0)
   }, [])
 
   // Form submission - payment handled by TipPaymentForm
@@ -185,30 +190,49 @@ function TipPageContent() {
       <Toaster position="top-center" />
       <div className="tip-container">
         <div className="event-header">
-          <h1>{event.name}</h1>
-          {event.description && <p className="event-description">{event.description}</p>}
+          <div className="event-header-top">
+            <h1>{sanitizeInput(event.name)}</h1>
+            <TrendingBadge isTrending={tipCount > 10 || totalTips > 100} />
+          </div>
+          {event.description && <p className="event-description">{sanitizeInput(event.description)}</p>}
         </div>
 
-        <div className="tip-stats">
-          <div className="stat">
-            <div className="stat-label">Total Tips</div>
-            <div className="stat-value">${totalTips.toFixed(2)}</div>
+        {/* Live Reactions Overlay */}
+        <LiveReactions eventId={eventId} />
+
+        {/* Simple Stats */}
+        <div className="tip-stats-simple">
+          <div className="stat-simple">
+            <span className="stat-icon">💰</span>
+            <div>
+              <div className="stat-label-simple">Total</div>
+              <div className="stat-value-simple">${totalTips.toFixed(2)}</div>
+            </div>
           </div>
-          <div className="stat">
-            <div className="stat-label">Tip Count</div>
-            <div className="stat-value">{tipCount}</div>
+          <div className="stat-simple">
+            <span className="stat-icon">🎁</span>
+            <div>
+              <div className="stat-label-simple">Tips</div>
+              <div className="stat-value-simple">{tipCount}</div>
+            </div>
           </div>
         </div>
 
-        <form onSubmit={handleTip} className="tip-form">
-          <div className="amount-selection">
-            <label>Select Amount</label>
-            <div className="preset-amounts">
+        {/* Simple Instructions */}
+        <div className="tip-instructions">
+          <p>💡 <strong>Super Easy:</strong> Select amount → Enter name (optional) → Tap tip!</p>
+        </div>
+
+        <form onSubmit={handleTip} className="tip-form-simple">
+          {/* Amount Selection - Big, Clear Buttons */}
+          <div className="amount-selection-simple">
+            <label className="section-label">💰 Choose Amount</label>
+            <div className="preset-amounts-simple">
               {displayPresets.map((amount, index) => (
                 <button
                   key={`${amount}-${index}`}
                   type="button"
-                  className={`preset-btn ${selectedAmount === amount ? 'active' : ''}`}
+                  className={`preset-btn-simple ${selectedAmount === amount ? 'active' : ''}`}
                   onClick={() => {
                     setSelectedAmount(amount)
                     setCustomAmount('')
@@ -219,13 +243,12 @@ function TipPageContent() {
                 </button>
               ))}
             </div>
-            <div className="custom-amount">
-              <label>Or enter custom amount</label>
+            <div className="custom-amount-simple">
               <input
                 type="number"
                 min="0.01"
                 step="0.01"
-                placeholder="0.00"
+                placeholder="Or enter custom $ amount"
                 value={customAmount}
                 onChange={(e) => {
                   const value = e.target.value
@@ -235,32 +258,38 @@ function TipPageContent() {
                   }
                 }}
                 disabled={tipping}
+                className="custom-input-simple"
               />
             </div>
           </div>
 
-          <div className="tipper-info">
-            <input
-              type="text"
-              placeholder="Your name (optional)"
-              value={tipperName}
-              onChange={(e) => setTipperName(e.target.value)}
-              maxLength={50}
-              disabled={tipping}
-            />
-            <textarea
-              placeholder="Leave a message (optional)"
-              value={tipperMessage}
-              onChange={(e) => setTipperMessage(e.target.value)}
-              rows="3"
-              maxLength={200}
-              disabled={tipping}
-            />
-          </div>
+          {/* Optional Info - Collapsed by Default */}
+          <details className="optional-info">
+            <summary>💬 Add name or message (optional)</summary>
+            <div className="tipper-info-simple">
+              <input
+                type="text"
+                placeholder="Your name (optional)"
+                value={tipperName}
+                onChange={(e) => setTipperName(e.target.value)}
+                maxLength={50}
+                disabled={tipping}
+              />
+              <textarea
+                placeholder="Leave a message (optional)"
+                value={tipperMessage}
+                onChange={(e) => setTipperMessage(e.target.value)}
+                rows="2"
+                maxLength={200}
+                disabled={tipping}
+              />
+            </div>
+          </details>
 
+          {/* Big Submit Button */}
           <button 
             type="submit" 
-            className="tip-submit-btn"
+            className="tip-submit-btn-simple"
             disabled={tipping || (!selectedAmount && !customAmount)}
           >
             {tipping ? (
@@ -269,13 +298,26 @@ function TipPageContent() {
                 Processing...
               </>
             ) : (
-              `Send Tip $${(selectedAmount || parseFloat(customAmount) || 0).toFixed(2)}`
+              <>
+                <span className="tip-icon-large">💝</span>
+                Send ${(selectedAmount || parseFloat(customAmount) || 0).toFixed(2)} Tip
+              </>
             )}
           </button>
+
+          {/* Security Note */}
+          <p className="security-note">
+            🔒 Secure payment powered by Stripe
+          </p>
         </form>
 
         {!tipsLoading && (
           <>
+            {/* Gamification Features */}
+            <TipStreak eventId={eventId} />
+            <TipGoals currentAmount={totalTips} />
+            <TipLeaderboard eventId={eventId} limit={5} />
+
             <SocialProof
               recentTips={recentTips}
               totalTips={totalTips}
@@ -293,6 +335,20 @@ function TipPageContent() {
                 console.log(`Shared to ${platform}`)
               }}
             />
+
+            {/* Become a DJ CTA */}
+            <div className="become-dj-cta">
+              <div className="become-dj-icon">🎵</div>
+              <h3>Want to Accept Tips Too?</h3>
+              <p>Create your own tipping page in seconds - it's free!</p>
+              <a
+                href={`${window.location.origin}/signup`}
+                className="become-dj-btn"
+              >
+                Sign Up Free - Start Earning
+              </a>
+              <p className="become-dj-note">Join 1000+ DJs already using TipNPlay!</p>
+            </div>
           </>
         )}
       </div>

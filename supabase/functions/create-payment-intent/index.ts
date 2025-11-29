@@ -4,6 +4,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@14.0.0'
+import { rateLimitMiddleware, getClientIdentifier, checkRateLimit } from '../_shared/rateLimiter.ts'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
@@ -19,6 +20,15 @@ serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
+  }
+
+  // Rate limiting: 10 requests per minute per IP
+  const rateLimitResponse = rateLimitMiddleware(req, 10, 60000)
+  if (rateLimitResponse) {
+    return new Response(rateLimitResponse.body, {
+      ...rateLimitResponse,
+      headers: { ...corsHeaders, ...rateLimitResponse.headers },
+    })
   }
 
   try {

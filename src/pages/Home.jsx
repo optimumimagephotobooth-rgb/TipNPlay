@@ -1,12 +1,21 @@
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import FadeIn from '../components/FadeIn'
 import StaggerChildren, { itemVariants } from '../components/StaggerChildren'
 import AnimatedButton from '../components/AnimatedButton'
 import BackgroundVideo from '../components/BackgroundVideo'
+import { getCookie, setTrackingCookies } from '../utils/cookies'
 import './Home.css'
 
 function Home() {
+  // Set tracking cookies on homepage visit (if consent given)
+  useEffect(() => {
+    const consent = getCookie('_tipnplay_cookie_consent')
+    if (consent === 'accepted' || consent === 'custom') {
+      setTrackingCookies()
+    }
+  }, [])
   const handleShareWhatsApp = () => {
     const url = window.location.href
     window.open(`https://wa.me/?text=${encodeURIComponent(`Check out TipnPlay: ${url}`)}`, '_blank')

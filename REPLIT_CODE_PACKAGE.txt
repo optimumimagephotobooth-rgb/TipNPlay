@@ -1,0 +1,87 @@
+# TipNPlay Complete Payment System - Code Package for Replit
+
+## 📋 Quick Setup Checklist
+
+1. ✅ Copy all files below to Replit
+2. ✅ Deploy Supabase Edge Functions
+3. ✅ Set environment variables
+4. ✅ Configure Stripe webhook
+5. ✅ Run database schema
+6. ✅ Test payment flow
+
+---
+
+## 🔧 Configuration Files
+
+### .replit (Already in repo - keep as is)
+### package.json (Already updated - keep as is)
+### vite.config.js (Already configured - keep as is)
+
+---
+
+## 📁 Files to Add/Update in Replit
+
+### NEW FILES TO CREATE:
+
+1. supabase/functions/create-payment-intent/index.ts
+2. supabase/functions/stripe-webhook/index.ts  
+3. supabase/functions/create-event-checkout/index.ts
+4. src/components/TipPaymentForm.jsx
+5. src/components/TipPaymentForm.css
+6. src/components/PayoutProfileForm.jsx
+7. src/components/PayoutProfileForm.css
+8. src/components/PayoutMethodsList.jsx
+9. src/components/PayoutMethodsList.css
+10. src/utils/payments.js
+
+### FILES TO UPDATE:
+
+1. src/pages/TipPage.jsx (add Stripe Elements)
+2. src/pages/CreateEvent.jsx (add checkout flow)
+3. SUPABASE_SCHEMA.sql (add payout tables)
+
+---
+
+## 🚀 Deployment Commands
+
+Run these in Replit Shell:
+
+```bash
+# Install Supabase CLI (if not installed)
+npm install -g supabase
+
+# Login to Supabase
+supabase login
+
+# Link your project
+supabase link --project-ref YOUR_PROJECT_REF
+
+# Deploy functions
+supabase functions deploy create-payment-intent
+supabase functions deploy stripe-webhook
+supabase functions deploy create-event-checkout
+```
+
+---
+
+## 🔑 Environment Variables Needed
+
+Add to Replit Secrets (🔒 tab):
+
+- VITE_STRIPE_PUBLISHABLE_KEY (already set)
+- VITE_SUPABASE_URL (already set)
+- VITE_SUPABASE_ANON_KEY (already set)
+
+Add to Supabase Edge Functions Secrets:
+
+- STRIPE_SECRET_KEY
+- STRIPE_WEBHOOK_SECRET
+- SUPABASE_SERVICE_ROLE_KEY
+- SITE_URL
+
+---
+
+## ✅ All Code is Ready!
+
+Just copy the files from the repo to Replit and follow the setup steps above.
+

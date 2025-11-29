@@ -1,0 +1,48 @@
+🚀 TIPNPLAY - REPLIT QUICK START
+================================
+
+STEP 1: IMPORT FROM GITHUB
+---------------------------
+1. Go to: https://replit.com
+2. Click "Create Repl" → "Import from GitHub"
+3. Paste: https://github.com/optimumimagephotobooth-rgb/TipNPlay
+4. Click "Import"
+5. Wait 1-2 minutes for auto-setup
+
+STEP 2: SET ENVIRONMENT VARIABLES
+----------------------------------
+In Replit → 🔒 Secrets tab, add:
+
+VITE_STRIPE_PUBLISHABLE_KEY = pk_test_your_key_here
+VITE_SUPABASE_URL = https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY = your-anon-key-here
+
+STEP 3: SETUP SUPABASE (5 minutes)
+------------------------------------
+1. Create account: https://supabase.com
+2. Create new project
+3. Go to SQL Editor
+4. Copy/paste entire SUPABASE_SCHEMA.sql
+5. Click "Run"
+6. Copy Project URL → Add to Replit Secrets
+7. Copy anon key → Add to Replit Secrets
+
+STEP 4: CLICK "RUN" BUTTON
+---------------------------
+That's it! Your app is running! 🎉
+
+TROUBLESHOOTING
+---------------
+- npm not found → Check .replit has nodejs-20
+- Port in use → Vite auto-selects next port
+- Env vars not working → Use Secrets (🔒), not .env
+- Supabase error → Verify URL/key, check SQL ran
+
+DOCUMENTATION
+-------------
+- Full guide: HOW_TO_COPY_TO_REPLIT.md
+- File list: ALL_FILES_FOR_REPLIT.md
+- Database: DATABASE_FUNCTIONS_GUIDE.md
+
+GITHUB: https://github.com/optimumimagephotobooth-rgb/TipNPlay
+

@@ -1,0 +1,68 @@
+📁 ANIMATION FILES (Copy these 4 files):
+==========================================
+src/components/AnimatedPage.jsx
+src/components/AnimatedButton.jsx
+src/components/FadeIn.jsx
+src/components/StaggerChildren.jsx
+
+📁 OTHER COMPONENT FILES (Copy these 24 files):
+===============================================
+src/components/QRCodeDisplay.jsx
+src/components/QRCodeDisplay.css
+src/components/QRCodeModal.jsx
+src/components/QRCodeModal.css
+src/components/SocialProof.jsx
+src/components/SocialProof.css
+src/components/ViralShare.jsx
+src/components/ViralShare.css
+src/components/AchievementBadge.jsx
+src/components/AchievementBadge.css
+src/components/Leaderboard.jsx
+src/components/Leaderboard.css
+src/components/EngagementPrompt.jsx
+src/components/EngagementPrompt.css
+src/components/PayoutProfileForm.jsx
+src/components/PayoutProfileForm.css
+src/components/PayoutMethodsList.jsx
+src/components/PayoutMethodsList.css
+src/components/TipPaymentForm.jsx
+src/components/TipPaymentForm.css
+src/components/BackgroundVideo.jsx
+src/components/BackgroundVideo.css
+src/components/SupabaseStatus.jsx
+src/components/SupabaseStatus.css
+
+📁 UPDATED PAGES (Copy these 4 files):
+=====================================
+src/pages/Home.jsx
+src/pages/CreateEvent.jsx
+src/pages/TipPage.jsx
+src/pages/DJDashboard.jsx
+
+📁 UTILITY FILES (Copy these 2 files):
+=====================================
+src/utils/payments.js
+src/lib/supabase.js
+
+📁 BACKEND FUNCTIONS (Copy these 3 folders):
+===========================================
+supabase/functions/create-payment-intent/index.ts
+supabase/functions/stripe-webhook/index.ts
+supabase/functions/create-event-checkout/index.ts
+
+📁 CONFIG FILES (Copy these 3 files):
+=====================================
+package.json (make sure it has framer-motion and lottie-react)
+.replit
+replit.nix
+
+📁 DATABASE (Run this in Supabase SQL Editor):
+=============================================
+SUPABASE_SCHEMA.sql
+
+---
+TOTAL: 40+ files to copy
+EASIEST: Import from GitHub (gets everything automatically!)
+
+GitHub URL: https://github.com/optimumimagephotobooth-rgb/TipNPlay
+

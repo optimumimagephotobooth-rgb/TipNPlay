@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
+import { sanitizeInput } from '../utils/sanitize'
+import { trackTip } from '../utils/analytics'
 import './TipPaymentForm.css'
 
 /**
@@ -40,13 +42,17 @@ function TipPaymentForm({
     setCardError(null)
 
     try {
+      // Sanitize inputs
+      const sanitizedName = tipperName ? sanitizeInput(tipperName) : null
+      const sanitizedMessage = message ? sanitizeInput(message) : null
+
       // Create payment intent
       const { createPaymentIntent } = await import('../utils/payments')
       const { clientSecret } = await createPaymentIntent({
         amount,
         eventId,
-        tipperName,
-        message,
+        tipperName: sanitizedName,
+        message: sanitizedMessage,
       })
 
       // Confirm payment
@@ -65,6 +71,11 @@ function TipPaymentForm({
       }
 
       if (paymentIntent.status === 'succeeded') {
+        // Track successful tip
+        trackTip(amount, eventId)
+        
+        toast.success(`Tip of $${amount.toFixed(2)} sent successfully! 🎉`)
+        
         if (onSuccess) {
           onSuccess(paymentIntent)
         }

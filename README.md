@@ -1,6 +1,6 @@
-# TipNPlay
+# Befitting Funeral Service
 
-Live Tipping Platform for DJs & Entertainers
+Compassionate funeral services and memorial planning
 
 ## Features
 

@@ -7,6 +7,10 @@ CREATE TABLE IF NOT EXISTS users (
   full_name TEXT,
   subscription_tier TEXT DEFAULT 'free',
   subscription_status TEXT DEFAULT 'active',
+  email_notifications BOOLEAN DEFAULT true,
+  tip_notifications BOOLEAN DEFAULT true,
+  weekly_summary BOOLEAN DEFAULT true,
+  avatar_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

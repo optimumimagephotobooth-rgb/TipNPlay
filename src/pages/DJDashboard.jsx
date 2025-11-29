@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
-import { format, subDays } from 'date-fns'
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { Link, useNavigate } from 'react-router-dom'
+import { format } from 'date-fns'
+import { supabase, eventsTable, tipsTable } from '../lib/supabase'
 import QRCodeDisplay from '../components/QRCodeDisplay'
 import QRCodeModal from '../components/QRCodeModal'
-import SupabaseStatus from '../components/SupabaseStatus'
-import Leaderboard from '../components/Leaderboard'
-import AchievementBadge from '../components/AchievementBadge'
-import { FacebookShareButton, TwitterShareButton, WhatsAppShareButton, EmailShareButton } from 'react-share'
-import { supabase, eventsTable, tipsTable } from '../lib/supabase'
-import toast, { Toaster } from 'react-hot-toast'
+import AnimatedButton from '../components/AnimatedButton'
+import FadeIn from '../components/FadeIn'
+import TipNotifications from '../components/TipNotifications'
+import toast from 'react-hot-toast'
 import './DJDashboard.css'
 
 function DJDashboard() {
@@ -18,134 +15,88 @@ function DJDashboard() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedEvent, setSelectedEvent] = useState(null)
-  const [analytics, setAnalytics] = useState(null)
-  const [timeRange, setTimeRange] = useState('7d') // 7d, 30d, all
+  const [stats, setStats] = useState({ total: 0, count: 0, today: 0 })
   const [showQRModal, setShowQRModal] = useState(false)
+  const [recentTips, setRecentTips] = useState([])
 
   useEffect(() => {
-    loadEvents()
+    loadDashboard()
   }, [])
 
   useEffect(() => {
     if (selectedEvent) {
-      loadAnalytics(selectedEvent.id)
+      loadEventStats(selectedEvent.id)
     }
-  }, [selectedEvent, timeRange])
+  }, [selectedEvent])
 
-  const loadEvents = async () => {
+  const loadDashboard = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        navigate('/login')
+        return
+      }
+
+      // Load events
+      const { data: eventsData, error: eventsError } = await supabase
         .from(eventsTable)
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
+        .limit(10)
 
-      if (error) throw error
-      setEvents(data || [])
+      if (eventsError) throw eventsError
+
+      setEvents(eventsData || [])
       
-      // Fallback demo data if Supabase not configured
-      if (!data || data.length === 0) {
-        setEvents([
-          {
-            id: 'demo1',
-            name: 'Summer Festival 2024',
-            totalTips: 1250.50,
-            tipCount: 45,
-            created_at: '2024-07-15T00:00:00Z'
-          },
-          {
-            id: 'demo2',
-            name: 'Club Night - Friday',
-            totalTips: 890.25,
-            tipCount: 32,
-            created_at: '2024-07-20T00:00:00Z'
-          }
-        ])
+      if (eventsData && eventsData.length > 0) {
+        setSelectedEvent(eventsData[0])
+      }
+
+      // Load all-time stats
+      const { data: tipsData } = await supabase
+        .from(tipsTable)
+        .select('amount, created_at, event_id')
+        .in('event_id', eventsData?.map(e => e.id) || [])
+
+      if (tipsData) {
+        const total = tipsData.reduce((sum, tip) => sum + parseFloat(tip.amount || 0), 0)
+        const today = new Date().toDateString()
+        const todayTips = tipsData.filter(tip => 
+          new Date(tip.created_at).toDateString() === today
+        )
+        const todayTotal = todayTips.reduce((sum, tip) => sum + parseFloat(tip.amount || 0), 0)
+
+        setStats({
+          total: total,
+          count: tipsData.length,
+          today: todayTotal
+        })
+
+        // Recent tips
+        setRecentTips(tipsData.slice(-5).reverse())
       }
     } catch (error) {
-      console.error('Error loading events:', error)
-      // Use demo data
-      setEvents([
-        {
-          id: 'demo1',
-          name: 'Summer Festival 2024',
-          totalTips: 1250.50,
-          tipCount: 45,
-          created_at: '2024-07-15T00:00:00Z'
-        }
-      ])
+      console.error('Error loading dashboard:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const loadAnalytics = async (eventId) => {
+  const loadEventStats = async (eventId) => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from(tipsTable)
-        .select('amount, created_at')
+        .select('*')
         .eq('event_id', eventId)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false })
+        .limit(10)
 
-      if (error) throw error
-
-      // Process data for charts
-      const now = new Date()
-      const daysAgo = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 365
-      const startDate = subDays(now, daysAgo)
-
-      const filteredData = (data || []).filter(tip => {
-        const tipDate = new Date(tip.created_at)
-        return tipDate >= startDate
-      })
-
-      // Group by day
-      const dailyData = {}
-      filteredData.forEach(tip => {
-        const date = format(new Date(tip.created_at), 'MMM dd')
-        if (!dailyData[date]) {
-          dailyData[date] = { date, amount: 0, count: 0 }
-        }
-        dailyData[date].amount += parseFloat(tip.amount)
-        dailyData[date].count += 1
-      })
-
-      const chartData = Object.values(dailyData)
-
-      // Hourly distribution
-      const hourlyData = Array(24).fill(0).map((_, hour) => ({
-        hour: `${hour}:00`,
-        count: filteredData.filter(tip => {
-          const tipHour = new Date(tip.created_at).getHours()
-          return tipHour === hour
-        }).length
-      }))
-
-      setAnalytics({
-        totalAmount: filteredData.reduce((sum, tip) => sum + parseFloat(tip.amount), 0),
-        totalCount: filteredData.length,
-        averageTip: filteredData.length > 0 
-          ? filteredData.reduce((sum, tip) => sum + parseFloat(tip.amount), 0) / filteredData.length 
-          : 0,
-        chartData,
-        hourlyData
-      })
+      if (data) {
+        setRecentTips(data)
+      }
     } catch (error) {
-      console.error('Error loading analytics:', error)
-      // Demo analytics
-      setAnalytics({
-        totalAmount: 1250.50,
-        totalCount: 45,
-        averageTip: 27.79,
-        chartData: [
-          { date: 'Jul 15', amount: 450, count: 15 },
-          { date: 'Jul 16', amount: 320, count: 12 },
-          { date: 'Jul 17', amount: 480, count: 18 }
-        ],
-        hourlyData: Array(24).fill(0).map((_, hour) => ({
-          hour: `${hour}:00`,
-          count: Math.floor(Math.random() * 5)
-        }))
-      })
+      console.error('Error loading event stats:', error)
     }
   }
 
@@ -153,258 +104,270 @@ function DJDashboard() {
     return `${window.location.origin}/tip/${eventId}`
   }
 
-  const handleShare = (platform, url) => {
-    toast.success(`Sharing to ${platform}...`)
+  const copyLink = (eventId) => {
+    navigator.clipboard.writeText(getTipUrl(eventId))
+    toast.success('Link copied! Share it with your audience 🎉')
   }
 
   if (loading) {
     return (
-      <div className="dj-dashboard">
-        <div className="container">
-          <div className="loading">Loading...</div>
-        </div>
+      <div className="dj-dashboard-loading">
+        <div className="loading-spinner-large"></div>
+        <p>Loading your dashboard...</p>
       </div>
     )
   }
 
-  const totalTips = events.reduce((sum, e) => sum + (e.totalTips || 0), 0)
-  const totalTipCount = events.reduce((sum, e) => sum + (e.tipCount || 0), 0)
-
   return (
-    <div className="dj-dashboard">
-      <Toaster />
-      <div className="container">
-        <SupabaseStatus />
-        <div className="dashboard-header">
-          <h1>DJ Dashboard</h1>
-          <Link to="/create-event" className="btn btn-primary">
-            + Create New Event
-          </Link>
-        </div>
-
-        <div className="dashboard-stats">
-          <div className="stat-card">
-            <h3>Total Events</h3>
-            <p className="stat-value">{events.length}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Total Tips</h3>
-            <p className="stat-value">${totalTips.toFixed(2)}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Total Tips Received</h3>
-            <p className="stat-value">{totalTipCount}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Average Tip</h3>
-            <p className="stat-value">
-              ${totalTipCount > 0 ? (totalTips / totalTipCount).toFixed(2) : '0.00'}
-            </p>
+    <div className="dj-dashboard-simple">
+      {/* Hero Stats Section */}
+      <FadeIn>
+        <div className="dashboard-hero">
+          <div className="hero-stats">
+            <div className="hero-stat">
+              <div className="stat-icon">💰</div>
+              <div className="stat-content">
+                <div className="stat-label">Total Earned</div>
+                <div className="stat-value">${stats.total.toFixed(2)}</div>
+              </div>
+            </div>
+            <div className="hero-stat">
+              <div className="stat-icon">🎁</div>
+              <div className="stat-content">
+                <div className="stat-label">Total Tips</div>
+                <div className="stat-value">{stats.count}</div>
+              </div>
+            </div>
+            <div className="hero-stat highlight">
+              <div className="stat-icon">⚡</div>
+              <div className="stat-content">
+                <div className="stat-label">Today</div>
+                <div className="stat-value">${stats.today.toFixed(2)}</div>
+              </div>
+            </div>
           </div>
         </div>
+      </FadeIn>
 
-        <div className="dashboard-content">
-          <div className="events-section">
-            <h2>Your Events</h2>
-            {events.length === 0 ? (
-              <div className="no-events">
-                <p>You haven't created any events yet.</p>
-                <Link to="/create-event" className="btn btn-primary">Create Your First Event</Link>
-              </div>
-            ) : (
-              <div className="events-grid">
-                {events.map(event => (
-                  <div 
-                    key={event.id} 
-                    className={`event-card ${selectedEvent?.id === event.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedEvent(event)}
-                  >
-                    <div className="event-card-header">
-                      <h3>{event.name}</h3>
-                      <span className="event-date">
-                        {format(new Date(event.created_at || Date.now()), 'MMM dd, yyyy')}
-                      </span>
-                    </div>
-                    <div className="event-stats">
-                      <div className="event-stat">
-                        <span className="label">Total:</span>
-                        <span className="value">${(event.totalTips || 0).toFixed(2)}</span>
-                      </div>
-                      <div className="event-stat">
-                        <span className="label">Tips:</span>
-                        <span className="value">{event.tipCount || 0}</span>
-                      </div>
-                    </div>
-                    <div className="event-actions">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          navigate(`/tip/${event.id}`)
-                        }}
-                        className="btn btn-secondary btn-sm"
-                      >
-                        View Page
-                      </button>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          navigator.clipboard.writeText(getTipUrl(event.id))
-                          toast.success('Link copied!')
-                        }}
-                        className="btn btn-secondary btn-sm"
-                      >
-                        Copy Link
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
+      {/* Quick Actions */}
+      <FadeIn delay={0.1}>
+        <div className="quick-actions">
+          <AnimatedButton
+            to="/create-event"
+            variant="primary"
+            className="action-btn primary-action"
+          >
+            ➕ Create New Event
+          </AnimatedButton>
+          <AnimatedButton
+            to="/live-stream-setup"
+            variant="primary"
+            className="action-btn live-stream-btn"
+          >
+            🎥 Live Stream Setup
+          </AnimatedButton>
           {selectedEvent && (
-            <div className="analytics-section">
-              <div className="analytics-header">
-                <h2>Analytics: {selectedEvent.name}</h2>
-                <div className="time-range-selector">
-                  <button 
-                    className={timeRange === '7d' ? 'active' : ''}
-                    onClick={() => setTimeRange('7d')}
-                  >
-                    7 Days
-                  </button>
-                  <button 
-                    className={timeRange === '30d' ? 'active' : ''}
-                    onClick={() => setTimeRange('30d')}
-                  >
-                    30 Days
-                  </button>
-                  <button 
-                    className={timeRange === 'all' ? 'active' : ''}
-                    onClick={() => setTimeRange('all')}
-                  >
-                    All Time
-                  </button>
-                </div>
-              </div>
+            <>
+              <AnimatedButton
+                onClick={() => copyLink(selectedEvent.id)}
+                variant="secondary"
+                className="action-btn"
+              >
+                📋 Copy Link
+              </AnimatedButton>
+              <AnimatedButton
+                onClick={() => setShowQRModal(true)}
+                variant="secondary"
+                className="action-btn"
+              >
+                📱 Show QR Code
+              </AnimatedButton>
+            </>
+          )}
+        </div>
+      </FadeIn>
 
-              {analytics && (
-                <>
-                  <div className="analytics-stats">
-                    <div className="analytics-stat">
-                      <label>Total Amount</label>
-                      <div className="value">${analytics.totalAmount.toFixed(2)}</div>
-                    </div>
-                    <div className="analytics-stat">
-                      <label>Total Tips</label>
-                      <div className="value">{analytics.totalCount}</div>
-                    </div>
-                    <div className="analytics-stat">
-                      <label>Average Tip</label>
-                      <div className="value">${analytics.averageTip.toFixed(2)}</div>
-                    </div>
+      {/* Events Grid */}
+      <FadeIn delay={0.2}>
+        <div className="events-section-simple">
+          <h2>Your Events</h2>
+          {events.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">🎵</div>
+              <h3>No events yet</h3>
+              <p>Create your first event to start accepting tips!</p>
+              <AnimatedButton
+                to="/create-event"
+                variant="primary"
+                className="empty-action"
+              >
+                Create Your First Event
+              </AnimatedButton>
+            </div>
+          ) : (
+            <div className="events-grid-simple">
+              {events.map(event => (
+                <div
+                  key={event.id}
+                  className={`event-card-simple ${selectedEvent?.id === event.id ? 'active' : ''}`}
+                  onClick={() => setSelectedEvent(event)}
+                >
+                  <div className="event-header-simple">
+                    <h3>{event.name}</h3>
+                    <span className="event-date-simple">
+                      {format(new Date(event.created_at || Date.now()), 'MMM dd')}
+                    </span>
                   </div>
-
-                  <div className="charts-grid">
-                    <div className="chart-card">
-                      <h3>Tips Over Time</h3>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={analytics.chartData}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                          <XAxis dataKey="date" stroke="rgba(255,255,255,0.7)" />
-                          <YAxis stroke="rgba(255,255,255,0.7)" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: 'rgba(0,0,0,0.9)', 
-                              border: '1px solid rgba(255,255,255,0.2)',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Line 
-                            type="monotone" 
-                            dataKey="amount" 
-                            stroke="#FFD700" 
-                            strokeWidth={2}
-                            dot={{ fill: '#FFD700' }}
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    <div className="chart-card">
-                      <h3>Tips by Hour</h3>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={analytics.hourlyData}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                          <XAxis dataKey="hour" stroke="rgba(255,255,255,0.7)" />
-                          <YAxis stroke="rgba(255,255,255,0.7)" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: 'rgba(0,0,0,0.9)', 
-                              border: '1px solid rgba(255,255,255,0.2)',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Bar dataKey="count" fill="#FFD700" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-
-                  <div className="share-section">
-                    <h3>Share Your Event</h3>
-                    <div className="share-buttons">
-                      <WhatsAppShareButton url={getTipUrl(selectedEvent.id)} title={selectedEvent.name}>
-                        <button className="share-btn whatsapp">WhatsApp</button>
-                      </WhatsAppShareButton>
-                      <FacebookShareButton url={getTipUrl(selectedEvent.id)}>
-                        <button className="share-btn facebook">Facebook</button>
-                      </FacebookShareButton>
-                      <TwitterShareButton url={getTipUrl(selectedEvent.id)} title={selectedEvent.name}>
-                        <button className="share-btn twitter">Twitter</button>
-                      </TwitterShareButton>
-                      <EmailShareButton url={getTipUrl(selectedEvent.id)} subject={selectedEvent.name}>
-                        <button className="share-btn email">Email</button>
-                      </EmailShareButton>
-                    </div>
-                    <div className="qr-section">
-                      <QRCodeDisplay
-                        value={getTipUrl(selectedEvent.id)}
-                        size={200}
-                        title="Event QR Code"
-                        showDownload={true}
-                        eventName={selectedEvent.name || selectedEvent.id}
-                        customColors={{
-                          fgColor: selectedEvent.custom_colors?.primary || '#000000',
-                          bgColor: '#FFFFFF'
-                        }}
-                      />
-                      <button 
-                        onClick={() => setShowQRModal(true)}
-                        className="btn btn-secondary"
-                        style={{ marginTop: '1rem', width: '100%' }}
-                      >
-                        🔍 View Full Size
-                      </button>
-                    </div>
-                    
-                    <QRCodeModal
-                      isOpen={showQRModal}
-                      onClose={() => setShowQRModal(false)}
-                      value={getTipUrl(selectedEvent.id)}
-                      eventName={selectedEvent.name || selectedEvent.id}
-                      customColors={{
-                        fgColor: selectedEvent.custom_colors?.primary || '#000000',
-                        bgColor: '#FFFFFF'
+                  <div className="event-actions-simple">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        copyLink(event.id)
                       }}
-                    />
+                      className="btn-icon"
+                      title="Copy link"
+                    >
+                      🔗
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setSelectedEvent(event)
+                        setShowQRModal(true)
+                      }}
+                      className="btn-icon"
+                      title="Show QR code"
+                    >
+                      📱
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/tip/${event.id}`)
+                      }}
+                      className="btn-icon"
+                      title="View page"
+                    >
+                      👁️
+                    </button>
                   </div>
-                </>
-              )}
+                </div>
+              ))}
             </div>
           )}
         </div>
-      </div>
+      </FadeIn>
+
+      {/* Selected Event Details */}
+      {selectedEvent && (
+        <FadeIn delay={0.3}>
+          <div className="event-details-simple">
+            <div className="details-header">
+              <h2>{selectedEvent.name}</h2>
+              <div className="share-buttons-simple">
+                <button
+                  onClick={() => {
+                    const url = getTipUrl(selectedEvent.id)
+                    window.open(`https://wa.me/?text=${encodeURIComponent(`Check out my tipping page: ${url}`)}`, '_blank')
+                  }}
+                  className="share-btn whatsapp"
+                >
+                  WhatsApp
+                </button>
+                <button
+                  onClick={() => {
+                    const url = getTipUrl(selectedEvent.id)
+                    navigator.clipboard.writeText(url)
+                    toast.success('Link copied! Share anywhere 🚀')
+                  }}
+                  className="share-btn copy"
+                >
+                  Copy Link
+                </button>
+              </div>
+            </div>
+
+            {/* QR Code */}
+            <div className="qr-section-simple">
+              <QRCodeDisplay
+                value={getTipUrl(selectedEvent.id)}
+                size={200}
+              />
+              <p className="qr-hint">Scan to tip instantly!</p>
+            </div>
+
+            {/* Recent Tips */}
+            {recentTips.length > 0 && (
+              <div className="recent-tips-simple">
+                <h3>Recent Tips 💝</h3>
+                <div className="tips-list">
+                  {recentTips.map(tip => (
+                    <div key={tip.id} className="tip-item">
+                      <div className="tip-amount">${parseFloat(tip.amount || 0).toFixed(2)}</div>
+                      <div className="tip-info">
+                        <div className="tip-name">{tip.tipper_name || 'Anonymous'}</div>
+                        {tip.message && <div className="tip-message">"{tip.message}"</div>}
+                        <div className="tip-time">{format(new Date(tip.created_at), 'MMM dd, h:mm a')}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </FadeIn>
+      )}
+
+      {/* Upgrade Prompt - Only show if user has events */}
+      {events.length > 0 && (
+        <FadeIn delay={0.4}>
+          <div className="upgrade-prompt">
+            <div className="upgrade-content">
+              <div className="upgrade-badge-top">✨ PRO</div>
+              <h3>🚀 Unlock More Features</h3>
+              <p>You're doing great! Upgrade to get:</p>
+              <ul className="upgrade-list">
+                <li>✅ Unlimited events (no limits!)</li>
+                <li>✅ Advanced analytics & reports</li>
+                <li>✅ Custom branding & themes</li>
+                <li>✅ Email notifications</li>
+                <li>✅ Priority support</li>
+              </ul>
+              <AnimatedButton
+                variant="primary"
+                className="upgrade-btn"
+                onClick={() => {
+                  toast.success('Redirecting to upgrade... 🎉')
+                  // In production, redirect to payment/subscription page
+                }}
+              >
+                Upgrade Now - Starting at $9.99/mo
+              </AnimatedButton>
+              <p className="upgrade-social-proof">Join 1000+ DJs already using TipNPlay Pro!</p>
+            </div>
+          </div>
+        </FadeIn>
+      )}
+
+      {/* QR Modal */}
+      {showQRModal && selectedEvent && (
+        <QRCodeModal
+          value={getTipUrl(selectedEvent.id)}
+          eventName={selectedEvent.name}
+          onClose={() => setShowQRModal(false)}
+        />
+      )}
+
+      {/* Tip Notifications (TikTok-style) */}
+      {selectedEvent && (
+        <TipNotifications
+          eventId={selectedEvent.id}
+          onTipReceived={(notification) => {
+            // Refresh stats when tip received
+            loadDashboard()
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -7,6 +7,8 @@ import QRCodeModal from '../components/QRCodeModal'
 import ViralShare from '../components/ViralShare'
 import { createEventCheckout } from '../utils/payments'
 import { supabase, eventsTable } from '../lib/supabase'
+import { sanitizeInput } from '../utils/sanitize'
+import { trackEventCreation } from '../utils/analytics'
 import toast, { Toaster } from 'react-hot-toast'
 import './CreateEvent.css'
 
@@ -93,10 +95,10 @@ function CreateEventForm() {
         return
       }
 
-      // Create event in database
+      // Sanitize and create event in database
       const eventPayload = {
-        name: eventData.name,
-        description: eventData.description,
+        name: sanitizeInput(eventData.name),
+        description: sanitizeInput(eventData.description || ''),
         event_date: eventData.event_date,
         event_time: eventData.event_time,
         end_time: eventData.end_time,
@@ -105,7 +107,7 @@ function CreateEventForm() {
           secondary: eventData.secondary_color
         },
         tip_presets: eventData.tip_presets,
-        thank_you_message: eventData.thank_you_message,
+        thank_you_message: sanitizeInput(eventData.thank_you_message || ''),
         created_at: new Date().toISOString()
       }
 
@@ -124,6 +126,8 @@ function CreateEventForm() {
         setCreatedEvent(localEvent)
       } else {
         setCreatedEvent(data)
+        // Track event creation
+        trackEventCreation(data.id, data.name)
       }
 
       // In production, process $6.00 payment here

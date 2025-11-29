@@ -1,0 +1,106 @@
+.dj-upgrade-prompt {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  padding: 2.5rem;
+  border-radius: 20px;
+  text-align: center;
+  color: white;
+  margin: 2rem 0;
+  box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.dj-upgrade-prompt::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.upgrade-badge {
+  display: inline-block;
+  background: white;
+  color: #f5576c;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.dj-upgrade-prompt h3 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.upgrade-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.upgrade-features li {
+  font-size: 1.1rem;
+  padding-left: 0.5rem;
+}
+
+.upgrade-cta {
+  background: white;
+  color: #f5576c;
+  padding: 1.25rem 2.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.upgrade-cta:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+}
+
+.upgrade-note {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .dj-upgrade-prompt {
+    padding: 2rem 1.5rem;
+  }
+
+  .dj-upgrade-prompt h3 {
+    font-size: 1.5rem;
+  }
+
+  .upgrade-features {
+    max-width: 100%;
+  }
+}
+

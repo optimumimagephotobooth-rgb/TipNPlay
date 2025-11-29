@@ -1,0 +1,40 @@
+.trending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+  }
+  50% {
+    box-shadow: 0 5px 25px rgba(255, 107, 107, 0.6);
+  }
+}
+
+.trending-icon {
+  font-size: 1rem;
+  animation: fire-flicker 1s ease-in-out infinite;
+}
+
+@keyframes fire-flicker {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.2) rotate(-10deg); }
+  75% { transform: scale(1.2) rotate(10deg); }
+}
+
+.trending-text {
+  letter-spacing: 2px;
+}
+
