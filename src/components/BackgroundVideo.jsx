@@ -23,13 +23,32 @@ function BackgroundVideo({
   const [hasError, setHasError] = useState(false)
   const [shouldLoad, setShouldLoad] = useState(false)
   const videoRef = useRef(null)
+  const containerRef = useRef(null)
 
   // Lazy load video after initial render
   useEffect(() => {
-    // Delay loading to not block initial render
     const timer = setTimeout(() => {
       setShouldLoad(true)
     }, 100)
+
+    if (typeof IntersectionObserver !== 'undefined' && containerRef.current) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setShouldLoad(true)
+            observer.disconnect()
+          }
+        },
+        { threshold: 0.25 }
+      )
+
+      observer.observe(containerRef.current)
+
+      return () => {
+        observer.disconnect()
+        clearTimeout(timer)
+      }
+    }
 
     return () => clearTimeout(timer)
   }, [])
@@ -61,7 +80,10 @@ function BackgroundVideo({
   }
 
   return (
-    <div className={`background-video-container ${className}`}>
+    <div
+      ref={containerRef}
+      className={`background-video-container ${className}`}
+    >
       {/* Fallback image - shows immediately */}
       {fallbackImage && (
         <div 

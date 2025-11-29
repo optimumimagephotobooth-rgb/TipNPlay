@@ -5,8 +5,6 @@
 
 import { getTrackingData } from './cookies'
 
-import { getTrackingData } from './cookies'
-
 /**
  * Track page view
  */

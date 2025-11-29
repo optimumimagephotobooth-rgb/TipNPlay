@@ -7,7 +7,52 @@
   flex-direction: column;
   gap: 0.75rem;
   pointer-events: none;
+  min-width: 320px;
+  overflow: visible;
 }
+
+.tip-bubbles-trail {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.tip-bubble {
+  position: absolute;
+  bottom: 20px;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 2px solid var(--bubble-accent, #0ea5e9);
+  min-width: 120px;
+  color: #fff;
+  background: linear-gradient(
+    120deg,
+    rgba(15, 23, 42, 0.95),
+    rgba(15, 23, 42, 0.82)
+  );
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  backface-visibility: hidden;
+  filter: drop-shadow(0 10px 25px rgba(15, 23, 42, 0.45));
+}
+
+.bubble-icon {
+  font-size: 1rem;
+}
+
+.bubble-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.bubble-text strong {
+  font-size: 0.95rem;
+}
+
 
 .tip-notification {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

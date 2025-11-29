@@ -3,14 +3,14 @@ import { motion } from 'framer-motion'
 import { 
   FacebookShareButton, 
   TwitterShareButton, 
-  WhatsAppShareButton, 
+  WhatsappShareButton, 
   EmailShareButton,
   FacebookIcon,
   TwitterIcon,
   WhatsappIcon,
   EmailIcon
 } from 'react-share'
-import toast from 'react-hot-toast'
+import { notifySuccess, notifyError } from '../utils/toast'
 import './ViralShare.css'
 
 /**
@@ -37,7 +37,7 @@ function ViralShare({
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)
-      toast.success('Link copied! Share it with your friends 🚀')
+      notifySuccess('Link copied! Share it with your friends 🚀')
       setTimeout(() => setCopied(false), 2000)
       
       // Track share event
@@ -45,7 +45,7 @@ function ViralShare({
         onShare('copy')
       }
     } catch (err) {
-      toast.error('Failed to copy link')
+      notifyError('Failed to copy link')
     }
   }
 
@@ -53,13 +53,13 @@ function ViralShare({
     if (onShare) {
       onShare(platform)
     }
-    toast.success(`Sharing to ${platform}...`)
+    notifySuccess(`Sharing to ${platform}...`)
   }
 
   const shareOptions = [
     {
       platform: 'whatsapp',
-      component: WhatsAppShareButton,
+      component: WhatsappShareButton,
       icon: WhatsappIcon,
       color: '#25D366'
     },

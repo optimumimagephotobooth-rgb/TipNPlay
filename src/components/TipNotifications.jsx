@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase, tipsTable } from '../lib/supabase'
-import toast from 'react-hot-toast'
+import { notifySuccess } from '../utils/toast'
 import './TipNotifications.css'
 
 /**
@@ -10,6 +10,23 @@ import './TipNotifications.css'
  */
 function TipNotifications({ eventId, onTipReceived }) {
   const [notifications, setNotifications] = useState([])
+  const [floatingTips, setFloatingTips] = useState([])
+
+  const addFloatingTip = useCallback((notification) => {
+    const bubbleId = `bubble-${notification.id}`
+    const bubble = {
+      ...notification,
+      bubbleId,
+      x: 15 + Math.random() * 60,
+      accent: Math.random() > 0.5 ? '#0ea5e9' : '#f472b6',
+    }
+
+    setFloatingTips((prev) => [...prev, bubble])
+
+    setTimeout(() => {
+      setFloatingTips((prev) => prev.filter((item) => item.bubbleId !== bubbleId))
+    }, 2200)
+  }, [])
 
   useEffect(() => {
     if (!eventId) return
@@ -35,12 +52,12 @@ function TipNotifications({ eventId, onTipReceived }) {
           }
 
           setNotifications(prev => [notification, ...prev.slice(0, 4)])
+          addFloatingTip(notification)
           
-          // Show toast
-          toast.success(`💰 $${notification.amount.toFixed(2)} from ${notification.tipperName}!`, {
-            icon: '🎉',
-            duration: 4000,
-          })
+          notifySuccess(
+            `💰 $${notification.amount.toFixed(2)} from ${notification.tipperName}!`,
+            { duration: 4000 },
+          )
 
           // Callback for parent component
           if (onTipReceived) {
@@ -58,10 +75,37 @@ function TipNotifications({ eventId, onTipReceived }) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [eventId, onTipReceived])
+  }, [eventId, onTipReceived, addFloatingTip])
 
   return (
     <div className="tip-notifications-container">
+      <div className="tip-bubbles-trail">
+        <AnimatePresence>
+          {floatingTips.map((bubble) => (
+            <motion.div
+              key={bubble.bubbleId}
+              className="tip-bubble"
+              style={{
+                left: `${bubble.x}%`,
+                borderColor: bubble.accent,
+                boxShadow: `0 10px 30px rgba(15,23,42,0.35), 0 0 20px ${bubble.accent}`,
+                '--bubble-accent': bubble.accent,
+              }}
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              animate={{ opacity: 1, y: -120, scale: 1 }}
+              exit={{ opacity: 0, y: -140, scale: 0.6 }}
+              transition={{ duration: 1.4 }}
+            >
+              <span className="bubble-icon">🎧</span>
+              <div className="bubble-text">
+                <strong>${bubble.amount.toFixed(2)}</strong>
+                <span>{bubble.tipperName}</span>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
       <AnimatePresence>
         {notifications.map((notification, index) => (
           <motion.div

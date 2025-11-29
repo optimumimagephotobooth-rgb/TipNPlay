@@ -1,6 +1,7 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { navLinks } from '../routes/routeConfig'
 import './Layout.css'
 
 function Layout({ children }) {
@@ -9,6 +10,10 @@ function Layout({ children }) {
   const [user, setUser] = useState(null)
   const isTipPage = location.pathname.startsWith('/tip/')
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
+  const availableNavLinks = useMemo(
+    () => navLinks.filter((route) => !route.requiresAuth || Boolean(user)),
+    [user],
+  )
 
   useEffect(() => {
     // Check current session
@@ -44,34 +49,15 @@ function Layout({ children }) {
             TIPNPLAY ■ ■ ■ ■
           </Link>
           <nav className="nav">
-            <Link 
-              to="/" 
-              className={location.pathname === '/' ? 'active' : ''}
-            >
-              Home
-            </Link>
-            {user && (
-              <>
-                <Link 
-                  to="/create-event" 
-                  className={location.pathname === '/create-event' ? 'active' : ''}
-                >
-                  Create Event
-                </Link>
-                <Link 
-                  to="/dj-dashboard" 
-                  className={location.pathname === '/dj-dashboard' ? 'active' : ''}
-                >
-                  Dashboard
-                </Link>
-                <Link 
-                  to="/profile" 
-                  className={location.pathname === '/profile' ? 'active' : ''}
-                >
-                  Profile
-                </Link>
-              </>
-            )}
+            {availableNavLinks.map((route) => (
+              <NavLink
+                key={route.path}
+                to={route.path}
+                className={({ isActive }) => (isActive ? 'active' : '')}
+              >
+                {route.label}
+              </NavLink>
+            ))}
             {user ? (
               <button onClick={handleLogout} className="auth-btn logout-btn">
                 Logout

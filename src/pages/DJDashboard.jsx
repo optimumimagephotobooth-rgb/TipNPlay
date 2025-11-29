@@ -7,7 +7,7 @@ import QRCodeModal from '../components/QRCodeModal'
 import AnimatedButton from '../components/AnimatedButton'
 import FadeIn from '../components/FadeIn'
 import TipNotifications from '../components/TipNotifications'
-import toast from 'react-hot-toast'
+import { notifySuccess } from '../utils/toast'
 import './DJDashboard.css'
 
 function DJDashboard() {
@@ -106,7 +106,7 @@ function DJDashboard() {
 
   const copyLink = (eventId) => {
     navigator.clipboard.writeText(getTipUrl(eventId))
-    toast.success('Link copied! Share it with your audience 🎉')
+    notifySuccess('Link copied! Share it with your audience 🎉')
   }
 
   if (loading) {
@@ -278,7 +278,7 @@ function DJDashboard() {
                   onClick={() => {
                     const url = getTipUrl(selectedEvent.id)
                     navigator.clipboard.writeText(url)
-                    toast.success('Link copied! Share anywhere 🚀')
+                    notifySuccess('Link copied! Share anywhere 🚀')
                   }}
                   className="share-btn copy"
                 >
@@ -337,7 +337,7 @@ function DJDashboard() {
                 variant="primary"
                 className="upgrade-btn"
                 onClick={() => {
-                  toast.success('Redirecting to upgrade... 🎉')
+                  notifySuccess('Redirecting to upgrade... 🎉')
                   // In production, redirect to payment/subscription page
                 }}
               >

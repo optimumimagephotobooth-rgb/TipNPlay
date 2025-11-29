@@ -9,7 +9,8 @@ import { createEventCheckout } from '../utils/payments'
 import { supabase, eventsTable } from '../lib/supabase'
 import { sanitizeInput } from '../utils/sanitize'
 import { trackEventCreation } from '../utils/analytics'
-import toast, { Toaster } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
+import { notifySuccess, notifyError, guidedToast } from '../utils/toast'
 import './CreateEvent.css'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_YOUR_KEY_HERE')
@@ -63,7 +64,7 @@ function CreateEventForm() {
   const handleNext = () => {
     if (step === 1) {
       if (!eventData.name || !eventData.event_date) {
-        toast.error('Please fill in all required fields')
+        notifyError('Please fill in all required fields')
         return
       }
       setStep(2)
@@ -90,7 +91,7 @@ function CreateEventForm() {
 
       if (stripeError) {
         setError(stripeError.message)
-        toast.error(stripeError.message)
+        notifyError(stripeError.message)
         setLoading(false)
         return
       }
@@ -117,28 +118,33 @@ function CreateEventForm() {
         .select()
         .single()
 
+      let finalEvent = data
+
       if (dbError) {
-        // If Supabase not configured, create local event ID
-        const localEvent = {
+        finalEvent = {
           id: `event_${Date.now()}`,
-          ...eventPayload
+          ...eventPayload,
         }
-        setCreatedEvent(localEvent)
       } else {
-        setCreatedEvent(data)
-        // Track event creation
         trackEventCreation(data.id, data.name)
       }
+
+      setCreatedEvent(finalEvent)
 
       // In production, process $6.00 payment here
       console.log('Payment method created:', paymentMethod.id)
       
-      toast.success('Event created successfully!')
+      notifySuccess('Event created successfully!')
+      guidedToast('Share your new TipNPlay link with guests', {
+        type: 'success',
+        actionLabel: 'View Tip Page',
+        onAction: () => navigate(`/tip/${finalEvent.id}`),
+      })
       setStep(3)
       
     } catch (err) {
       setError('An error occurred. Please try again.')
-      toast.error('Error creating event')
+      notifyError('Error creating event')
       console.error(err)
     } finally {
       setLoading(false)
@@ -161,10 +167,10 @@ function CreateEventForm() {
             <div className="link-container">
               <input type="text" value={tipUrl} readOnly />
               <button 
-                onClick={() => {
-                  navigator.clipboard.writeText(tipUrl)
-                  toast.success('Link copied!')
-                }}
+              onClick={() => {
+                navigator.clipboard.writeText(tipUrl)
+                notifySuccess('Link copied! Share with your crowd!')
+              }}
                 className="copy-btn"
               >
                 Copy
